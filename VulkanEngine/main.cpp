@@ -5,9 +5,11 @@
 #include <stdexcept>
 #include <cstdlib>
 
-class HelloTriangleApplication {
+class HelloTriangleApplication 
+{
 public:
-    void run() {
+    void run() 
+    {
         InitWindow();
         InitVulkan();
         MainLoop();
@@ -15,30 +17,62 @@ public:
     }
 
 private:
-    void InitWindow() {
+    void InitWindow() 
+    {
+        // Initialize the GLFW library
+        glfwInit();
+
+        // Do not create an OpenGL context
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+        // Make the window non-resizable
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+        // Initialize the window
+        constexpr uint32_t WIDTH = 800;
+        constexpr uint32_t HEIGHT = 600;
+        m_Window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+
 
     }
 
-    void InitVulkan() {
+    void InitVulkan() 
+    {
 
     }
 
-    void MainLoop() {
+    void MainLoop() 
+    {
+        while (!glfwWindowShouldClose(m_Window)) {
+            // Check for events
+            glfwPollEvents();
 
+
+        }
     }
 
-    void Cleanup() {
-
+    void Cleanup() 
+    {
+        // Destroy the window 
+        glfwDestroyWindow(m_Window);
+        
+        // Terminate GLFW
+        glfwTerminate();
     }
+
+    GLFWwindow* m_Window;
 };
 
-int main() {
+int main() 
+{
     HelloTriangleApplication app;
 
-    try {
+    try 
+    {
         app.run();
     }
-    catch (const std::exception& e) {
+    catch (const std::exception& e) 
+    {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
