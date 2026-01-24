@@ -1,4 +1,5 @@
 #include "HelloTriangleApplication.h"
+#include "ValidationLayers.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -28,6 +29,11 @@ void HelloTriangleApplication::InitWindow()
 
 void HelloTriangleApplication::CreateInstance()
 {
+    if (b_EnableValidationLayers && !CheckValidationLayerSupport())
+    { 
+        throw std::runtime_error("Validation layers requested, but not available!");
+    }
+
     // Provide application info - may be used by driver to optimize (optional)
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -56,13 +62,15 @@ void HelloTriangleApplication::CreateInstance()
     createInfo.enabledLayerCount = 0;
 
 
-    ValidateExtensions(glfwExtensions, glfwExtensionCount);
-    
+    if (!ValidateExtensions(glfwExtensions, glfwExtensionCount))
+    {
+        throw std::runtime_error("Extension validation failed!");
+    }   
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
     if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS) 
     {
-        throw std::runtime_error("failed to create instance!");
+        throw std::runtime_error("Failed to create instance!");
     }
 }
 
@@ -127,7 +135,7 @@ int HelloTriangleApplication::ValidateExtensions(const char **extensions, uint32
         }
     }
 
-    /*
+    /* -------- Alternative implementation using std::set --------
     // Create a set of available extension names for O(log n) lookup
     std::set<std::string> availableSet;
     for (const auto& extension : availableExtensions)
@@ -155,6 +163,37 @@ int HelloTriangleApplication::ValidateExtensions(const char **extensions, uint32
     }
     */
 
+}
+
+bool HelloTriangleApplication::CheckValidationLayerSupport()
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (const char* layerName : validationLayers) 
+    {
+        bool layerFound = false;
+
+        for (const auto& layerProperties : availableLayers) 
+        {
+            if (strcmp(layerName, layerProperties.layerName) == 0) 
+            {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound) 
+        {
+            return false;
+        }
+
+    }
+    
+    return true;
 }
 
 GLFWwindow* m_Window;

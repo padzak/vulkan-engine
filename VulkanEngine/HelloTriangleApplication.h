@@ -24,6 +24,7 @@ private:
     void MainLoop();
     void Cleanup();
     int  ValidateExtensions(const char **extensions, uint32_t requiredExtensionCount);
+    bool CheckValidationLayerSupport();
 
     GLFWwindow* m_Window;
     VkInstance  m_Instance;
