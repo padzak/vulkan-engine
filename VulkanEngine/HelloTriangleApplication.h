@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 struct GLFWwindow;
 struct VkInstance_T;
 typedef VkInstance_T* VkInstance;
@@ -21,6 +23,7 @@ private:
     void InitVulkan();
     void MainLoop();
     void Cleanup();
+    int  ValidateExtensions(const char **extensions, uint32_t requiredExtensionCount);
 
     GLFWwindow* m_Window;
     VkInstance  m_Instance;
