@@ -83,6 +83,9 @@ void HelloTriangleApplication::MainLoop()
 
 void HelloTriangleApplication::Cleanup()
 {
+    // Destroy the Vulkan instance
+    vkDestroyInstance(m_Instance, nullptr);
+
     // Destroy the window 
     glfwDestroyWindow(m_Window);
 
