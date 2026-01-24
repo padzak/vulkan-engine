@@ -20,8 +20,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 324,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-01-24T18:57:01.275Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
@@ -32,8 +45,7 @@
               "RelativeToolTip": "..\\..\\..\\..\\Programs\\glfw-3.4.bin.WIN64\\include\\GLFW\\glfw3.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-01-21T10:01:23.679Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T10:01:23.679Z"
             },
             {
               "$type": "Document",
@@ -45,21 +57,7 @@
               "RelativeToolTip": "..\\..\\..\\..\\Programs\\glm-master\\glm\\vec4.hpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-01-21T10:01:22.196Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "main.cpp",
-              "DocumentMoniker": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
-              "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
-              "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-01-21T09:59:33.767Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T10:01:22.196Z"
             }
           ]
         }

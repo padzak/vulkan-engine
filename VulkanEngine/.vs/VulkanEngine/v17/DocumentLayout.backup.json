@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{3CFA2E29-8838-4295-8324-0997CA540F50}|VulkanEngine.vcxproj|T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\SupportHelper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3CFA2E29-8838-4295-8324-0997CA540F50}|VulkanEngine.vcxproj|solutionrelative:SupportHelper.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3CFA2E29-8838-4295-8324-0997CA540F50}|VulkanEngine.vcxproj|T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{3CFA2E29-8838-4295-8324-0997CA540F50}|VulkanEngine.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -20,11 +24,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 324,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "main.cpp",
+              "DocumentMoniker": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-01-24T18:57:01.275Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "glfw3.h",
               "DocumentMoniker": "T:\\Programs\\glfw-3.4.bin.WIN64\\include\\GLFW\\glfw3.h",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Programs\\glfw-3.4.bin.WIN64\\include\\GLFW\\glfw3.h",
@@ -32,12 +49,11 @@
               "RelativeToolTip": "..\\..\\..\\..\\Programs\\glfw-3.4.bin.WIN64\\include\\GLFW\\glfw3.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-01-21T10:01:23.679Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T10:01:23.679Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "vec4.hpp",
               "DocumentMoniker": "T:\\Programs\\glm-master\\glm\\vec4.hpp",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Programs\\glm-master\\glm\\vec4.hpp",
@@ -45,18 +61,17 @@
               "RelativeToolTip": "..\\..\\..\\..\\Programs\\glm-master\\glm\\vec4.hpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-01-21T10:01:22.196Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-21T10:01:22.196Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "main.cpp",
-              "DocumentMoniker": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
-              "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\main.cpp",
-              "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAUAAAAAAAAAA==",
+              "Title": "SupportHelper.cpp",
+              "DocumentMoniker": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\SupportHelper.cpp",
+              "RelativeDocumentMoniker": "SupportHelper.cpp",
+              "ToolTip": "T:\\poligon\\GIT\\vulkan-engine\\VulkanEngine\\SupportHelper.cpp",
+              "RelativeToolTip": "SupportHelper.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-01-21T09:59:33.767Z",
               "EditorCaption": ""
