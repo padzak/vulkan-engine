@@ -55,6 +55,27 @@ static void DestroyDebugUtilsMessengerEXT(
     }
 }
 
+static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+{
+    createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+
+    // Specify which severities to handle by a specific callback
+    createInfo.messageSeverity =
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    // Filter which types of messages to handle
+    createInfo.messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    // Specify the callback function
+    createInfo.pfnUserCallback = DebugCallback;
+    // Optional data passed to the callback
+    createInfo.pUserData = nullptr;
+}
+
 void HelloTriangleApplication::MainLoop()
 {
     while (!glfwWindowShouldClose(m_Window)) {
@@ -108,14 +129,19 @@ void HelloTriangleApplication::CreateInstance()
     createInfo.ppEnabledExtensionNames = glfwExtensions.data();
 
     // Global validation layers
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
     if (b_EnableValidationLayers) 
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
+
+        PopulateDebugMessengerCreateInfo(debugCreateInfo);
+        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
     } 
     else
     {
         createInfo.enabledLayerCount = 0;
+        createInfo.pNext = nullptr;
     }
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
@@ -153,8 +179,6 @@ void HelloTriangleApplication::Cleanup()
     std::cout << "Cleanup complete\n";
 }
 
-//VkDebugUtilsMessengerEXT_T VkDebugUtilsMessengerEXT
-//VkDebugUtilsMessengerEXT m_DebugMessenger;
 
 void HelloTriangleApplication::SetupDebugMessenger()
 {
@@ -164,27 +188,11 @@ void HelloTriangleApplication::SetupDebugMessenger()
     }
 
     VkDebugUtilsMessengerCreateInfoEXT createInfoValidation{};
-    createInfoValidation.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    
-    // Specify which severities to handle by a specific callback
-    createInfoValidation.messageSeverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | 
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | 
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    // Filter which types of messages to handle
-    createInfoValidation.messageType =
-        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    // Specify the callback function
-    createInfoValidation.pfnUserCallback = DebugCallback;
-    // Optional data passed to the callback
-    createInfoValidation.pUserData = nullptr; 
+    PopulateDebugMessengerCreateInfo(createInfoValidation);
 
     if (CreateDebugUtilsMessengerEXT(m_Instance, &createInfoValidation, nullptr, &m_DebugMessenger) != VK_SUCCESS) {
         throw std::runtime_error("failed to set up debug messenger!");
     }
-    
 }
 
 bool HelloTriangleApplication::ValidateExtensions(const char **extensions, uint32_t requiredExtensionCount)
