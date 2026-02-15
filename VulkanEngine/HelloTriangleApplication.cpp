@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <set>
 #include <vector>
+#include <map>
 
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
@@ -74,6 +75,25 @@ static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT&
     createInfo.pfnUserCallback = DebugCallback;
     // Optional data passed to the callback
     createInfo.pUserData = nullptr;
+}
+
+static bool IsDeviceSuitable(VkPhysicalDevice device)
+{
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+}
+
+static int RateDeviceSuitability(VkPhysicalDevice device)
+{
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    
+    return deviceProperties.limits.maxImageDimension2D;
 }
 
 void HelloTriangleApplication::MainLoop()
@@ -155,6 +175,57 @@ void HelloTriangleApplication::InitVulkan()
 {
     CreateInstance();
     SetupDebugMessenger();
+    PickPhysicalDevice();
+}
+
+void HelloTriangleApplication::PickPhysicalDevice()
+{
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
+
+    if (deviceCount == 0) 
+    {
+        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
+    
+
+    std::multimap<int, VkPhysicalDevice> candidates;
+
+    for (const auto& device : devices) 
+    {
+        if (IsDeviceSuitable(device)) 
+        {
+            int score = RateDeviceSuitability(device);
+            candidates.insert(std::make_pair(score, device));
+        }
+    }
+
+    if (candidates.rbegin()->first > 0) 
+    {
+        m_PhysicalDevice = candidates.rbegin()->second;
+    }
+    else
+    {
+        throw std::runtime_error("Failed to find a suitable GPU!");
+    }
+
+
+    //for (const auto& device : devices) 
+    //{
+    //    if (IsDeviceSuitable(device)) 
+    //    {
+    //        m_PhysicalDevice = device;
+    //        break;
+    //    }
+    //}
+
+    //if (m_PhysicalDevice == VK_NULL_HANDLE) 
+    //{
+    //    throw std::runtime_error("Failed to find a suitable GPU!");
+    //}
 }
 
 

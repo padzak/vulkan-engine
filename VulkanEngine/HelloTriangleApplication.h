@@ -10,6 +10,8 @@ typedef VkInstance_T* VkInstance;
 //typedef  VkDebugUtilsMessengerEXT_T* VkDebugUtilsMessengerEXT;
 struct VkDebugUtilsMessengerEXT_T;
 typedef VkDebugUtilsMessengerEXT_T *VkDebugUtilsMessengerEXT;
+struct VkPhysicalDevice_T;
+typedef VkPhysicalDevice_T* VkPhysicalDevice;
 
 class HelloTriangleApplication
 {
@@ -26,6 +28,7 @@ private:
     void InitWindow();
     void CreateInstance();
     void InitVulkan();
+    void PickPhysicalDevice();
     void MainLoop();
     void Cleanup();
     void SetupDebugMessenger();
@@ -35,6 +38,7 @@ private:
 
     GLFWwindow* m_Window;
     VkInstance  m_Instance;
+    VkPhysicalDevice m_PhysicalDevice = nullptr;
 
     // Even the debug callback in Vulkan is managed with a handle 
     // that needs to be explicitly created and destroyed
