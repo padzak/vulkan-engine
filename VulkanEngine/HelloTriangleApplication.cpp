@@ -5,11 +5,54 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <stdexcept>
-#include <set>
-#include <vector>
 #include <map>
+#include <optional>
+#include <set>
+#include <stdexcept>
+#include <vector>
 
+struct QueueFamilyIndices
+{
+    std::optional<uint32_t> graphicsFamily;
+    
+    bool IsComplete() const
+    {
+        return graphicsFamily.has_value();
+    }
+};
+
+// There are different types of queues that originate from different queue families 
+// and each family of queues allows only a subset of commands. For example, there could be 
+// a queue family that only allows processing of compute commands or one that only 
+// allows memory transfer related commands.
+static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies)
+    {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphicsFamily = i;
+        }
+
+        if (indices.IsComplete()) // TODO Won't I lock myself out of using several GPUs with this early exit?
+        {
+            break;
+        }
+
+        i++;
+    }
+
+    return indices;
+}
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -84,8 +127,11 @@ static bool IsDeviceSuitable(VkPhysicalDevice device)
 
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+    QueueFamilyIndices indices = FindQueueFamilies(device);
 
-    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU 
+        && deviceFeatures.geometryShader 
+        && indices.IsComplete();
 }
 
 static int RateDeviceSuitability(VkPhysicalDevice device)
