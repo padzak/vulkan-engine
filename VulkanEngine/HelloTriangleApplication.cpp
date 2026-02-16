@@ -222,6 +222,7 @@ void HelloTriangleApplication::InitVulkan()
     CreateInstance();
     SetupDebugMessenger();
     PickPhysicalDevice();
+    CreateLogicalDevice();
 }
 
 void HelloTriangleApplication::PickPhysicalDevice()
@@ -274,7 +275,53 @@ void HelloTriangleApplication::PickPhysicalDevice()
     //}
 }
 
+void HelloTriangleApplication::CreateLogicalDevice()
+{
+    // After selecting a physical device to use we need to set up a logical device to interface with it
+    QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
 
+    VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    queueCreateInfo.queueCount = 1;
+
+    // Vulkan lets you assign priorities to queues to influence the scheduling of 
+    // command buffer execution using floating point numbers between 0.0 and 1.0.
+    float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+
+    VkDeviceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.pQueueCreateInfos = &queueCreateInfo;
+    createInfo.queueCreateInfoCount = 1;
+
+    createInfo.pEnabledFeatures = &deviceFeatures;
+
+    // Vulkan made a distinction between instance and device specific validation layers,
+    // but this is no longer the case.That means that the enabledLayerCount and ppEnabledLayerNames 
+    // fields of VkDeviceCreateInfo are ignored by up-to-date implementations.
+    createInfo.enabledExtensionCount = 0;
+
+    if (b_EnableValidationLayers) 
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    } 
+    else
+    {
+        createInfo.enabledLayerCount = 0;
+    }
+
+    if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("Failed to create logical device!");
+    }
+
+    // Retrieve queue handles for each queue family
+    vkGetDeviceQueue(m_LogicalDevice, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+}
 
 void HelloTriangleApplication::Cleanup()
 {
@@ -283,6 +330,10 @@ void HelloTriangleApplication::Cleanup()
         // Destroy the debug messanger
         DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
     }
+
+    // Destroy the logical device
+    // Logical devices don’t interact directly with instances, which is why it’s not included as a parameter.
+    vkDestroyDevice(m_LogicalDevice, nullptr);
 
     // Destroy the Vulkan instance
     vkDestroyInstance(m_Instance, nullptr);

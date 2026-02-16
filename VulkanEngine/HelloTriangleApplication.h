@@ -6,12 +6,14 @@
 struct GLFWwindow;
 struct VkInstance_T;
 typedef VkInstance_T* VkInstance;
-//struct VkDebugUtilsMessengerEXT_T;
-//typedef  VkDebugUtilsMessengerEXT_T* VkDebugUtilsMessengerEXT;
 struct VkDebugUtilsMessengerEXT_T;
 typedef VkDebugUtilsMessengerEXT_T *VkDebugUtilsMessengerEXT;
 struct VkPhysicalDevice_T;
 typedef VkPhysicalDevice_T* VkPhysicalDevice;
+struct VkDevice_T;
+typedef VkDevice_T* VkDevice;
+struct VkQueue_T;
+typedef VkQueue_T* VkQueue;
 
 class HelloTriangleApplication
 {
@@ -29,6 +31,7 @@ private:
     void CreateInstance();
     void InitVulkan();
     void PickPhysicalDevice();
+    void CreateLogicalDevice();
     void MainLoop();
     void Cleanup();
     void SetupDebugMessenger();
@@ -36,9 +39,11 @@ private:
     bool CheckValidationLayerSupport();
     std::vector<const char*> GetRequiredExtensions();
 
-    GLFWwindow* m_Window;
-    VkInstance  m_Instance;
-    VkPhysicalDevice m_PhysicalDevice = nullptr;
+    GLFWwindow*         m_Window;
+    VkInstance          m_Instance;
+    VkPhysicalDevice    m_PhysicalDevice    = nullptr;
+    VkDevice            m_LogicalDevice     = nullptr;
+    VkQueue             m_GraphicsQueue     = nullptr;
 
     // Even the debug callback in Vulkan is managed with a handle 
     // that needs to be explicitly created and destroyed
