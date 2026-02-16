@@ -1,8 +1,17 @@
 #include "HelloTriangleApplication.h"
 #include "ValidationLayers.h"
 
+#if PLATFORM_WIN
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+
+#if PLATFORM_WIN
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+#include <GLFW/glfw3native.h>
 
 #include <iostream>
 #include <map>
@@ -14,10 +23,11 @@
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
-    
+    std::optional<uint32_t> presentFamily;
+
     bool IsComplete() const
     {
-        return graphicsFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
 
@@ -25,7 +35,7 @@ struct QueueFamilyIndices
 // and each family of queues allows only a subset of commands. For example, there could be 
 // a queue family that only allows processing of compute commands or one that only 
 // allows memory transfer related commands.
-static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
+static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     QueueFamilyIndices indices;
 
@@ -41,6 +51,13 @@ static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphicsFamily = i;
+        }
+
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+        if (presentSupport)
+        {
+            indices.presentFamily = i;
         }
 
         if (indices.IsComplete()) // TODO Won't I lock myself out of using several GPUs with this early exit?
@@ -120,14 +137,14 @@ static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT&
     createInfo.pUserData = nullptr;
 }
 
-static bool IsDeviceSuitable(VkPhysicalDevice device)
+static bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-    QueueFamilyIndices indices = FindQueueFamilies(device);
+    QueueFamilyIndices indices = FindQueueFamilies(device, surface);
 
     return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU 
         && deviceFeatures.geometryShader 
@@ -221,6 +238,7 @@ void HelloTriangleApplication::InitVulkan()
 {
     CreateInstance();
     SetupDebugMessenger();
+    CreateSurface();
     PickPhysicalDevice();
     CreateLogicalDevice();
 }
@@ -243,7 +261,7 @@ void HelloTriangleApplication::PickPhysicalDevice()
 
     for (const auto& device : devices) 
     {
-        if (IsDeviceSuitable(device)) 
+        if (IsDeviceSuitable(device, m_Surface)) 
         {
             int score = RateDeviceSuitability(device);
             candidates.insert(std::make_pair(score, device));
@@ -278,24 +296,31 @@ void HelloTriangleApplication::PickPhysicalDevice()
 void HelloTriangleApplication::CreateLogicalDevice()
 {
     // After selecting a physical device to use we need to set up a logical device to interface with it
-    QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+    QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice, m_Surface);
 
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
-
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+        
     // Vulkan lets you assign priorities to queues to influence the scheduling of 
     // command buffer execution using floating point numbers between 0.0 and 1.0.
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (uint32_t queueFamily : uniqueQueueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.emplace_back(queueCreateInfo);
+    }
+    
 
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
@@ -321,6 +346,33 @@ void HelloTriangleApplication::CreateLogicalDevice()
 
     // Retrieve queue handles for each queue family
     vkGetDeviceQueue(m_LogicalDevice, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+    vkGetDeviceQueue(m_LogicalDevice, indices.presentFamily.value(), 0, &m_PresentQueue);
+}
+
+void HelloTriangleApplication::CreateSurface()
+{
+    if (glfwCreateWindowSurface(m_Instance, m_Window, nullptr, &m_Surface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create window surface!");
+    }
+}
+
+// Platform specific extension can be used to create a surface
+void HelloTriangleApplication::CreateSurfaceForPlatform()
+{
+#if PLATFORM_WIN
+    VkWin32SurfaceCreateInfoKHR createInfo{};
+
+    createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    createInfo.hwnd = glfwGetWin32Window(m_Window);
+    createInfo.hinstance = GetModuleHandle(nullptr);
+
+    if (vkCreateWin32SurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("Failed to create window surface!");
+    }
+#endif
+
 }
 
 void HelloTriangleApplication::Cleanup()
@@ -334,6 +386,9 @@ void HelloTriangleApplication::Cleanup()
     // Destroy the logical device
     // Logical devices don’t interact directly with instances, which is why it’s not included as a parameter.
     vkDestroyDevice(m_LogicalDevice, nullptr);
+
+    // Destroy the surface
+    vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
 
     // Destroy the Vulkan instance
     vkDestroyInstance(m_Instance, nullptr);
